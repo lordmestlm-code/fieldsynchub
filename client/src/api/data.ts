@@ -1,0 +1,470 @@
+import { Job, Customer, Technician, Invoice, Estimate, DashboardStats } from '../types';
+
+// Mock Customers
+export const mockCustomers: Customer[] = [
+  {
+    id: 'cust-1',
+    name: 'John Smith',
+    email: 'john.smith@email.com',
+    phone: '(555) 123-4567',
+    address: '123 Oak Street',
+    city: 'Springfield',
+    state: 'IL',
+    zipCode: '62701',
+    notes: 'Prefers morning appointments',
+    createdAt: '2024-01-15T10:00:00Z',
+    totalJobs: 12,
+    totalSpent: 3450.00,
+  },
+  {
+    id: 'cust-2',
+    name: 'Sarah Johnson',
+    email: 'sarah.j@email.com',
+    phone: '(555) 234-5678',
+    address: '456 Maple Avenue',
+    city: 'Springfield',
+    state: 'IL',
+    zipCode: '62702',
+    createdAt: '2024-02-20T14:30:00Z',
+    totalJobs: 8,
+    totalSpent: 2100.00,
+  },
+  {
+    id: 'cust-3',
+    name: 'Michael Brown',
+    email: 'mbrown@email.com',
+    phone: '(555) 345-6789',
+    address: '789 Pine Road',
+    city: 'Chicago',
+    state: 'IL',
+    zipCode: '60601',
+    notes: 'Commercial property owner',
+    createdAt: '2024-03-10T09:15:00Z',
+    totalJobs: 25,
+    totalSpent: 12500.00,
+  },
+  {
+    id: 'cust-4',
+    name: 'Emily Davis',
+    email: 'emily.d@email.com',
+    phone: '(555) 456-7890',
+    address: '321 Elm Street',
+    city: 'Springfield',
+    state: 'IL',
+    zipCode: '62703',
+    createdAt: '2024-04-05T11:45:00Z',
+    totalJobs: 5,
+    totalSpent: 890.00,
+  },
+  {
+    id: 'cust-5',
+    name: 'Robert Wilson',
+    email: 'r.wilson@email.com',
+    phone: '(555) 567-8901',
+    address: '654 Cedar Lane',
+    city: 'Naperville',
+    state: 'IL',
+    zipCode: '60540',
+    notes: 'VIP customer - priority service',
+    createdAt: '2024-05-12T16:00:00Z',
+    totalJobs: 18,
+    totalSpent: 7800.00,
+  },
+];
+
+// Mock Technicians
+export const mockTechnicians: Technician[] = [
+  {
+    id: 'tech-1',
+    name: 'James Anderson',
+    email: 'james.a@fieldsynchub.com',
+    phone: '(555) 111-2222',
+    specialty: 'HVAC & Electrical',
+    status: 'available',
+    rating: 4.8,
+    jobsCompleted: 156,
+    color: '#10B981',
+  },
+  {
+    id: 'tech-2',
+    name: 'Maria Garcia',
+    email: 'maria.g@fieldsynchub.com',
+    phone: '(555) 222-3333',
+    specialty: 'Plumbing',
+    status: 'busy',
+    rating: 4.9,
+    jobsCompleted: 203,
+    color: '#3B82F6',
+  },
+  {
+    id: 'tech-3',
+    name: 'David Lee',
+    email: 'david.l@fieldsynchub.com',
+    phone: '(555) 333-4444',
+    specialty: 'General Maintenance',
+    status: 'available',
+    rating: 4.6,
+    jobsCompleted: 98,
+    color: '#F59E0B',
+  },
+  {
+    id: 'tech-4',
+    name: 'Lisa Thompson',
+    email: 'lisa.t@fieldsynchub.com',
+    phone: '(555) 444-5555',
+    specialty: 'Appliance Repair',
+    status: 'offline',
+    rating: 4.7,
+    jobsCompleted: 134,
+    color: '#8B5CF6',
+  },
+];
+
+// Mock Jobs
+export const mockJobs: Job[] = [
+  {
+    id: 'job-1',
+    title: 'AC Unit Installation',
+    description: 'Install new central AC unit in residential home',
+    customerId: 'cust-1',
+    technicianId: 'tech-1',
+    status: 'scheduled',
+    priority: 'high',
+    scheduledDate: '2026-03-14',
+    scheduledTime: '09:00',
+    estimatedDuration: 240,
+    address: '123 Oak Street, Springfield, IL 62701',
+    notes: 'Customer will be home. Pre-install survey completed.',
+    createdAt: '2024-03-01T10:00:00Z',
+    updatedAt: '2024-03-10T14:30:00Z',
+    price: 2500.00,
+  },
+  {
+    id: 'job-2',
+    title: 'Leak Repair',
+    description: 'Fix leaking pipe under kitchen sink',
+    customerId: 'cust-2',
+    technicianId: 'tech-2',
+    status: 'in_progress',
+    priority: 'urgent',
+    scheduledDate: '2026-03-14',
+    scheduledTime: '14:00',
+    estimatedDuration: 90,
+    address: '456 Maple Avenue, Springfield, IL 62702',
+    createdAt: '2024-03-05T09:00:00Z',
+    updatedAt: '2024-03-14T08:30:00Z',
+    price: 350.00,
+  },
+  {
+    id: 'job-3',
+    title: 'Annual Furnace Maintenance',
+    description: 'Yearly furnace inspection and maintenance',
+    customerId: 'cust-3',
+    technicianId: 'tech-1',
+    status: 'pending',
+    priority: 'medium',
+    scheduledDate: '2026-03-15',
+    scheduledTime: '10:00',
+    estimatedDuration: 120,
+    address: '789 Pine Road, Chicago, IL 60601',
+    createdAt: '2024-03-08T11:00:00Z',
+    updatedAt: '2024-03-08T11:00:00Z',
+    price: 199.00,
+  },
+  {
+    id: 'job-4',
+    title: 'Dishwasher Installation',
+    description: 'Install new dishwasher and connect to plumbing',
+    customerId: 'cust-4',
+    status: 'pending',
+    priority: 'medium',
+    scheduledDate: '2026-03-16',
+    scheduledTime: '11:00',
+    estimatedDuration: 180,
+    address: '321 Elm Street, Springfield, IL 62703',
+    createdAt: '2024-03-10T14:00:00Z',
+    updatedAt: '2024-03-10T14:00:00Z',
+    price: 450.00,
+  },
+  {
+    id: 'job-5',
+    title: 'Water Heater Repair',
+    description: 'Diagnose and repair water heater not heating properly',
+    customerId: 'cust-5',
+    technicianId: 'tech-3',
+    status: 'completed',
+    priority: 'high',
+    scheduledDate: '2026-03-13',
+    scheduledTime: '09:00',
+    estimatedDuration: 150,
+    actualDuration: 165,
+    address: '654 Cedar Lane, Naperville, IL 60540',
+    notes: 'Replaced heating element. Customer satisfied.',
+    createdAt: '2024-03-02T10:00:00Z',
+    updatedAt: '2024-03-13T12:45:00Z',
+    price: 425.00,
+  },
+  {
+    id: 'job-6',
+    title: 'Electrical Outlet Replacement',
+    description: 'Replace faulty outlets in living room and bedroom',
+    customerId: 'cust-1',
+    technicianId: 'tech-1',
+    status: 'completed',
+    priority: 'low',
+    scheduledDate: '2026-03-12',
+    scheduledTime: '15:00',
+    estimatedDuration: 60,
+    actualDuration: 45,
+    address: '123 Oak Street, Springfield, IL 62701',
+    createdAt: '2024-03-01T16:00:00Z',
+    updatedAt: '2024-03-12T16:30:00Z',
+    price: 150.00,
+  },
+  {
+    id: 'job-7',
+    title: 'Sump Pump Installation',
+    description: 'Install new sump pump in basement',
+    customerId: 'cust-3',
+    status: 'scheduled',
+    priority: 'high',
+    scheduledDate: '2026-03-17',
+    scheduledTime: '08:00',
+    estimatedDuration: 180,
+    address: '789 Pine Road, Chicago, IL 60601',
+    createdAt: '2024-03-11T09:00:00Z',
+    updatedAt: '2024-03-11T09:00:00Z',
+    price: 750.00,
+  },
+  {
+    id: 'job-8',
+    title: 'Toilet Repair',
+    description: 'Fix running toilet in main bathroom',
+    customerId: 'cust-4',
+    status: 'cancelled',
+    priority: 'medium',
+    scheduledDate: '2026-03-14',
+    scheduledTime: '16:00',
+    estimatedDuration: 60,
+    address: '321 Elm Street, Springfield, IL 62703',
+    notes: 'Customer cancelled - rescheduled to next week',
+    createdAt: '2024-03-09T10:00:00Z',
+    updatedAt: '2024-03-13T09:00:00Z',
+    price: 125.00,
+  },
+];
+
+// Mock Invoices
+export const mockInvoices: Invoice[] = [
+  {
+    id: 'inv-1',
+    invoiceNumber: 'INV-2024-001',
+    customerId: 'cust-1',
+    jobId: 'job-6',
+    status: 'paid',
+    items: [
+      { id: 'item-1', description: 'Electrical Outlet Replacement', quantity: 2, unitPrice: 75.00, total: 150.00 },
+    ],
+    subtotal: 150.00,
+    tax: 11.25,
+    total: 161.25,
+    dueDate: '2024-03-27',
+    paidDate: '2024-03-15',
+    createdAt: '2024-03-12T16:30:00Z',
+    updatedAt: '2024-03-15T10:00:00Z',
+  },
+  {
+    id: 'inv-2',
+    invoiceNumber: 'INV-2024-002',
+    customerId: 'cust-5',
+    jobId: 'job-5',
+    status: 'paid',
+    items: [
+      { id: 'item-2', description: 'Service Call', quantity: 1, unitPrice: 75.00, total: 75.00 },
+      { id: 'item-3', description: 'Parts - Heating Element', quantity: 1, unitPrice: 125.00, total: 125.00 },
+      { id: 'item-4', description: 'Labor', quantity: 2.75, unitPrice: 75.00, total: 206.25 },
+    ],
+    subtotal: 406.25,
+    tax: 30.47,
+    total: 436.72,
+    dueDate: '2024-03-28',
+    paidDate: '2024-03-14',
+    createdAt: '2024-03-13T13:00:00Z',
+    updatedAt: '2024-03-14T09:30:00Z',
+  },
+  {
+    id: 'inv-3',
+    invoiceNumber: 'INV-2024-003',
+    customerId: 'cust-2',
+    status: 'sent',
+    items: [
+      { id: 'item-5', description: 'Plumbing Service Call', quantity: 1, unitPrice: 75.00, total: 75.00 },
+      { id: 'item-6', description: 'Pipe Repair Materials', quantity: 1, unitPrice: 45.00, total: 45.00 },
+    ],
+    subtotal: 120.00,
+    tax: 9.00,
+    total: 129.00,
+    dueDate: '2024-03-25',
+    createdAt: '2024-03-10T11:00:00Z',
+    updatedAt: '2024-03-10T11:00:00Z',
+    notes: 'Payment due upon service completion',
+  },
+  {
+    id: 'inv-4',
+    invoiceNumber: 'INV-2024-004',
+    customerId: 'cust-3',
+    status: 'draft',
+    items: [
+      { id: 'item-7', description: 'AC Unit Installation', quantity: 1, unitPrice: 2500.00, total: 2500.00 },
+    ],
+    subtotal: 2500.00,
+    tax: 187.50,
+    total: 2687.50,
+    dueDate: '2024-04-14',
+    createdAt: '2024-03-14T10:00:00Z',
+    updatedAt: '2024-03-14T10:00:00Z',
+    notes: '50% deposit required to schedule',
+  },
+  {
+    id: 'inv-5',
+    invoiceNumber: 'INV-2024-005',
+    customerId: 'cust-4',
+    status: 'overdue',
+    items: [
+      { id: 'item-8', description: 'Minor Plumbing Repair', quantity: 1, unitPrice: 85.00, total: 85.00 },
+    ],
+    subtotal: 85.00,
+    tax: 6.38,
+    total: 91.38,
+    dueDate: '2024-03-01',
+    createdAt: '2024-02-15T14:00:00Z',
+    updatedAt: '2024-02-15T14:00:00Z',
+    notes: 'Reminder: Payment overdue',
+  },
+];
+
+// Mock Estimates
+export const mockEstimates: Estimate[] = [
+  {
+    id: 'est-1',
+    estimateNumber: 'EST-2024-001',
+    customerId: 'cust-1',
+    jobId: 'job-1',
+    status: 'accepted',
+    items: [
+      { id: 'item-e1', description: 'Central AC Unit - Carrier 3 Ton', quantity: 1, unitPrice: 1800.00, total: 1800.00 },
+      { id: 'item-e2', description: 'Installation Labor', quantity: 4, unitPrice: 75.00, total: 300.00 },
+      { id: 'item-e3', description: 'Permit Fees', quantity: 1, unitPrice: 150.00, total: 150.00 },
+    ],
+    subtotal: 2250.00,
+    tax: 168.75,
+    total: 2418.75,
+    validUntil: '2024-04-01',
+    createdAt: '2024-03-01T10:00:00Z',
+    updatedAt: '2024-03-05T14:00:00Z',
+  },
+  {
+    id: 'est-2',
+    estimateNumber: 'EST-2024-002',
+    customerId: 'cust-3',
+    status: 'sent',
+    items: [
+      { id: 'item-e4', description: 'Sump Pump - Zoeller 1/3 HP', quantity: 1, unitPrice: 450.00, total: 450.00 },
+      { id: 'item-e5', description: 'Installation Labor', quantity: 3, unitPrice: 75.00, total: 225.00 },
+      { id: 'item-e6', description: 'Materials', quantity: 1, unitPrice: 75.00, total: 75.00 },
+    ],
+    subtotal: 750.00,
+    tax: 56.25,
+    total: 806.25,
+    validUntil: '2024-04-15',
+    createdAt: '2024-03-11T09:00:00Z',
+    updatedAt: '2024-03-11T09:00:00Z',
+  },
+  {
+    id: 'est-3',
+    estimateNumber: 'EST-2024-003',
+    customerId: 'cust-4',
+    status: 'draft',
+    items: [
+      { id: 'item-e7', description: 'Dishwasher - Bosch 800 Series', quantity: 1, unitPrice: 850.00, total: 850.00 },
+      { id: 'item-e8', description: 'Installation & Hookup', quantity: 2, unitPrice: 75.00, total: 150.00 },
+    ],
+    subtotal: 1000.00,
+    tax: 75.00,
+    total: 1075.00,
+    validUntil: '2024-04-20',
+    createdAt: '2024-03-10T14:00:00Z',
+    updatedAt: '2024-03-10T14:00:00Z',
+  },
+  {
+    id: 'est-4',
+    estimateNumber: 'EST-2024-004',
+    customerId: 'cust-5',
+    status: 'rejected',
+    items: [
+      { id: 'item-e9', description: 'Full HVAC System Replacement', quantity: 1, unitPrice: 8500.00, total: 8500.00 },
+    ],
+    subtotal: 8500.00,
+    tax: 637.50,
+    total: 9137.50,
+    validUntil: '2024-02-28',
+    createdAt: '2024-02-01T10:00:00Z',
+    updatedAt: '2024-02-25T16:00:00Z',
+    notes: 'Customer decided to repair instead of replace',
+  },
+];
+
+// Dashboard Stats
+export const mockDashboardStats: DashboardStats = {
+  totalRevenue: 28450.00,
+  revenueChange: 12.5,
+  jobsCompleted: 156,
+  jobsChange: 8,
+  pendingJobs: 12,
+  activeTechnicians: 3,
+  customersCount: 89,
+  averageRating: 4.75,
+};
+
+// Helper functions
+export const getCustomerById = (id: string): Customer | undefined => 
+  mockCustomers.find(c => c.id === id);
+
+export const getTechnicianById = (id: string): Technician | undefined => 
+  mockTechnicians.find(t => t.id === id);
+
+export const getJobById = (id: string): Job | undefined => 
+  mockJobs.find(j => j.id === id);
+
+export const getInvoiceById = (id: string): Invoice | undefined => 
+  mockInvoices.find(i => i.id === id);
+
+export const getEstimateById = (id: string): Estimate | undefined => 
+  mockEstimates.find(e => e.id === id);
+
+export const getJobsByCustomerId = (customerId: string): Job[] => 
+  mockJobs.filter(j => j.customerId === customerId);
+
+export const getInvoicesByCustomerId = (customerId: string): Invoice[] => 
+  mockInvoices.filter(i => i.customerId === customerId);
+
+export const getEstimatesByCustomerId = (customerId: string): Estimate[] => 
+  mockEstimates.filter(e => e.customerId === customerId);
+
+// Revenue data for charts (last 6 months)
+export const monthlyRevenue = [
+  { month: 'Oct', revenue: 12400 },
+  { month: 'Nov', revenue: 18200 },
+  { month: 'Dec', revenue: 15600 },
+  { month: 'Jan', revenue: 21300 },
+  { month: 'Feb', revenue: 19800 },
+  { month: 'Mar', revenue: 28450 },
+];
+
+// Jobs by status
+export const jobsByStatus = [
+  { status: 'Completed', count: 156, color: '#10B981' },
+  { status: 'In Progress', count: 8, color: '#3B82F6' },
+  { status: 'Scheduled', count: 12, color: '#F59E0B' },
+  { status: 'Pending', count: 4, color: '#6B7280' },
+];
