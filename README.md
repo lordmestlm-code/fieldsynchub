@@ -1,6 +1,6 @@
 # FieldSyncHub - Field Service Management Application
 
-A full-stack field service management web application built with React and Node.js.
+A professional field service management web application built with React.
 
 ## Features
 
@@ -14,42 +14,53 @@ A full-stack field service management web application built with React and Node.
 
 ## Tech Stack
 
-- **Frontend:** React + Vite + React Router
-- **UI Components:** Custom components with professional styling
-- **Backend:** Node.js + Express
-- **Database:** SQLite with better-sqlite3
-- **Authentication:** JWT-based auth
+- **Frontend:** React 18 + TypeScript + Vite
+- **Styling:** Tailwind CSS
+- **Routing:** React Router v6
+- **Icons:** Lucide React
+- **Charts:** Recharts
+- **State:** React Context + Hooks
 
 ## Quick Start
 
 ```bash
 # Install dependencies
-cd server && npm install
-cd ../client && npm install
+cd client
+npm install
 
-# Start the development server
-# Terminal 1: cd server && npm run dev
-# Terminal 2: cd client && npm run dev
+# Start development server
+npm run dev
 ```
+
+The app will be available at `http://localhost:5173`
 
 ## Project Structure
 
 ```
 fieldsynchub-app/
-├── client/          # React frontend
+├── client/
 │   ├── src/
+│   │   ├── api/           # Mock data API
 │   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   └── styles/
-│   └── package.json
-├── server/          # Node.js backend
-│   ├── routes/
-│   ├── models/
-│   ├── middleware/
-│   └── package.json
+│   │   │   ├── ui/        # Reusable UI components
+│   │   │   ├── layout/    # Layout components
+│   │   │   └── features/  # Feature components
+│   │   ├── context/       # React Context providers
+│   │   ├── pages/         # Page components
+│   │   ├── types/         # TypeScript type definitions
+│   │   └── styles/        # Global styles
+│   ├── index.html
+│   ├── package.json
+│   ├── tailwind.config.js
+│   └── vite.config.js
 └── README.md
 ```
+
+## Design
+
+- **Primary Color:** Emerald Green (#10B981)
+- **Style:** Professional, modern, clean
+- **UI:** Card-based layouts with subtle shadows
 
 ## License
 
