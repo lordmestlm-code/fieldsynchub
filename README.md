@@ -1,6 +1,6 @@
 # FieldSyncHub - Field Service Management Application
 
-A professional field service management web application built with React.
+A professional full-stack field service management application with React frontend and Node.js backend.
 
 ## Features
 
@@ -19,20 +19,39 @@ A professional field service management web application built with React.
 - **Routing:** React Router v6
 - **Icons:** Lucide React
 - **Charts:** Recharts
-- **State:** React Context + Hooks
+- **Backend:** Node.js + Express
+- **Database:** SQLite (sql.js - WebAssembly, no native build needed)
 
 ## Quick Start
 
 ```bash
 # Install dependencies
-cd client
-npm install
+cd client && npm install
+cd ../server && npm install
 
-# Start development server
-npm run dev
+# Start the application (two terminals)
+
+# Terminal 1 - Backend
+cd server && npm run dev
+
+# Terminal 2 - Frontend
+cd client && npm run dev
 ```
 
-The app will be available at `http://localhost:5173`
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:3001
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/stats` | Dashboard statistics |
+| GET/POST | `/api/customers` | Customer CRUD |
+| GET/POST | `/api/technicians` | Technician CRUD |
+| GET/POST/PUT | `/api/jobs` | Job management |
+| GET/POST | `/api/invoices` | Invoice management |
+| GET/POST | `/api/estimates` | Estimate management |
+| GET | `/api/revenue` | Monthly revenue data |
 
 ## Project Structure
 
@@ -40,7 +59,7 @@ The app will be available at `http://localhost:5173`
 fieldsynchub-app/
 ├── client/
 │   ├── src/
-│   │   ├── api/           # Mock data API
+│   │   ├── api/           # API service layer
 │   │   ├── components/
 │   │   │   ├── ui/        # Reusable UI components
 │   │   │   ├── layout/    # Layout components
@@ -53,6 +72,10 @@ fieldsynchub-app/
 │   ├── package.json
 │   ├── tailwind.config.js
 │   └── vite.config.js
+├── server/
+│   ├── server.js          # Express API server
+│   ├── database.sqlite    # SQLite database file
+│   └── package.json
 └── README.md
 ```
 

@@ -1,12 +1,6 @@
-import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useEffect, useState } from 'react';
 import { AppState, AppAction, Job, Customer, Technician, Invoice, Estimate } from '../types';
-import { 
-  mockJobs, 
-  mockCustomers, 
-  mockTechnicians, 
-  mockInvoices, 
-  mockEstimates 
-} from '../api';
+import * as api from '../api';
 
 const initialState: AppState = {
   jobs: [],
@@ -115,72 +109,153 @@ function appReducer(state: AppState, action: AppAction): AppState {
 interface AppContextType {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
+  stats: api.DashboardStats | null;
+  refreshStats: () => Promise<void>;
   // Helper functions
-  addJob: (job: Job) => void;
-  updateJob: (job: Job) => void;
+  addJob: (job: Partial<Job>) => Promise<Job>;
+  updateJob: (id: string, job: Partial<Job>) => Promise<void>;
   deleteJob: (id: string) => void;
-  addCustomer: (customer: Customer) => void;
-  updateCustomer: (customer: Customer) => void;
-  deleteCustomer: (id: string) => void;
-  addTechnician: (technician: Technician) => void;
-  updateTechnician: (technician: Technician) => void;
-  deleteTechnician: (id: string) => void;
-  addInvoice: (invoice: Invoice) => void;
-  updateInvoice: (invoice: Invoice) => void;
-  deleteInvoice: (id: string) => void;
-  addEstimate: (estimate: Estimate) => void;
-  updateEstimate: (estimate: Estimate) => void;
-  deleteEstimate: (id: string) => void;
+  addCustomer: (customer: Partial<Customer>) => Promise<Customer>;
+  updateCustomer: (id: string, customer: Partial<Customer>) => Promise<void>;
+  deleteCustomer: (id: string) => Promise<void>;
+  addTechnician: (technician: Partial<Technician>) => Promise<Technician>;
+  updateTechnician: (id: string, technician: Partial<Technician>) => Promise<void>;
+  addInvoice: (invoice: Partial<Invoice>) => Promise<Invoice>;
+  updateInvoice: (id: string, invoice: Partial<Invoice>) => Promise<void>;
+  addEstimate: (estimate: Partial<Estimate>) => Promise<Estimate>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
+  const [stats, setStats] = useState<api.DashboardStats | null>(null);
 
-  // Initialize with mock data
+  // Load data from API on mount
   useEffect(() => {
-    dispatch({ type: 'SET_JOBS', payload: mockJobs });
-    dispatch({ type: 'SET_CUSTOMERS', payload: mockCustomers });
-    dispatch({ type: 'SET_TECHNICIANS', payload: mockTechnicians });
-    dispatch({ type: 'SET_INVOICES', payload: mockInvoices });
-    dispatch({ type: 'SET_ESTIMATES', payload: mockEstimates });
-    dispatch({ 
-      type: 'SET_USER', 
-      payload: { 
-        id: 'user-1', 
-        name: 'Admin User', 
-        email: 'admin@fieldsynchub.com', 
-        role: 'admin' 
-      } 
-    });
+    loadAllData();
   }, []);
 
-  // Helper functions
-  const addJob = (job: Job) => dispatch({ type: 'ADD_JOB', payload: job });
-  const updateJob = (job: Job) => dispatch({ type: 'UPDATE_JOB', payload: job });
-  const deleteJob = (id: string) => dispatch({ type: 'DELETE_JOB', payload: id });
+  async function loadAllData() {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      const [jobs, customers, technicians, invoices, estimates, statsData] = await Promise.all([
+        api.getJobs(),
+        api.getCustomers(),
+        api.getTechnicians(),
+        api.getInvoices(),
+        api.getEstimates(),
+        api.getStats(),
+      ]);
 
-  const addCustomer = (customer: Customer) => dispatch({ type: 'ADD_CUSTOMER', payload: customer });
-  const updateCustomer = (customer: Customer) => dispatch({ type: 'UPDATE_CUSTOMER', payload: customer });
-  const deleteCustomer = (id: string) => dispatch({ type: 'DELETE_CUSTOMER', payload: id });
+      dispatch({ type: 'SET_JOBS', payload: jobs });
+      dispatch({ type: 'SET_CUSTOMERS', payload: customers });
+      dispatch({ type: 'SET_TECHNICIANS', payload: technicians });
+      dispatch({ type: 'SET_INVOICES', payload: invoices });
+      dispatch({ type: 'SET_ESTIMATES', payload: estimates });
+      setStats(statsData);
 
-  const addTechnician = (technician: Technician) => dispatch({ type: 'ADD_TECHNICIAN', payload: technician });
-  const updateTechnician = (technician: Technician) => dispatch({ type: 'UPDATE_TECHNICIAN', payload: technician });
-  const deleteTechnician = (id: string) => dispatch({ type: 'DELETE_TECHNICIANS', payload: id });
+      dispatch({ 
+        type: 'SET_USER', 
+        payload: { 
+          id: 'user-1', 
+          name: 'Admin User', 
+          email: 'admin@fieldsynchub.com', 
+          role: 'admin' 
+        } 
+      });
+    } catch (error) {
+      console.error('Failed to load data:', error);
+      dispatch({ type: 'SET_ERROR', payload: 'Failed to connect to server. Make sure the backend is running.' });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }
 
-  const addInvoice = (invoice: Invoice) => dispatch({ type: 'ADD_INVOICE', payload: invoice });
-  const updateInvoice = (invoice: Invoice) => dispatch({ type: 'UPDATE_INVOICE', payload: invoice });
-  const deleteInvoice = (id: string) => dispatch({ type: 'DELETE_INVOICE', payload: id });
+  const refreshStats = async () => {
+    try {
+      const statsData = await api.getStats();
+      setStats(statsData);
+    } catch (error) {
+      console.error('Failed to refresh stats:', error);
+    }
+  };
 
-  const addEstimate = (estimate: Estimate) => dispatch({ type: 'ADD_ESTIMATE', payload: estimate });
-  const updateEstimate = (estimate: Estimate) => dispatch({ type: 'UPDATE_ESTIMATE', payload: estimate });
-  const deleteEstimate = (id: string) => dispatch({ type: 'DELETE_ESTIMATE', payload: id });
+  // API-backed helper functions
+  const addJob = async (job: Partial<Job>): Promise<Job> => {
+    const newJob = await api.createJob(job);
+    dispatch({ type: 'ADD_JOB', payload: newJob });
+    return newJob;
+  };
+
+  const updateJob = async (id: string, job: Partial<Job>): Promise<void> => {
+    await api.updateJob(id, job);
+    const updatedJob = await api.getJob(id);
+    if (updatedJob) {
+      dispatch({ type: 'UPDATE_JOB', payload: updatedJob });
+    }
+  };
+
+  const deleteJob = (id: string) => {
+    dispatch({ type: 'DELETE_JOB', payload: id });
+  };
+
+  const addCustomer = async (customer: Partial<Customer>): Promise<Customer> => {
+    const newCustomer = await api.createCustomer(customer);
+    dispatch({ type: 'ADD_CUSTOMER', payload: newCustomer });
+    return newCustomer;
+  };
+
+  const updateCustomer = async (id: string, customer: Partial<Customer>): Promise<void> => {
+    await api.updateCustomer(id, customer);
+    const updatedCustomer = await api.getCustomer(id);
+    if (updatedCustomer) {
+      dispatch({ type: 'UPDATE_CUSTOMER', payload: updatedCustomer });
+    }
+  };
+
+  const deleteCustomer = async (id: string): Promise<void> => {
+    await api.deleteCustomer(id);
+    dispatch({ type: 'DELETE_CUSTOMER', payload: id });
+  };
+
+  const addTechnician = async (technician: Partial<Technician>): Promise<Technician> => {
+    const newTech = await api.createTechnician(technician);
+    dispatch({ type: 'ADD_TECHNICIAN', payload: newTech });
+    return newTech;
+  };
+
+  const updateTechnician = async (id: string, technician: Partial<Technician>): Promise<void> => {
+    await api.updateTechnician(id, technician);
+    const updatedTech = await api.getTechnician(id);
+    if (updatedTech) {
+      dispatch({ type: 'UPDATE_TECHNICIAN', payload: updatedTech });
+    }
+  };
+
+  const addInvoice = async (invoice: Partial<Invoice>): Promise<Invoice> => {
+    const newInvoice = await api.createInvoice(invoice);
+    dispatch({ type: 'ADD_INVOICE', payload: newInvoice });
+    return newInvoice;
+  };
+
+  const updateInvoice = async (id: string, invoice: Partial<Invoice>): Promise<void> => {
+    await api.updateInvoice(id, invoice);
+    loadAllData(); // Reload to get updated data
+  };
+
+  const addEstimate = async (estimate: Partial<Estimate>): Promise<Estimate> => {
+    const newEstimate = await api.createEstimate(estimate);
+    dispatch({ type: 'ADD_ESTIMATE', payload: newEstimate });
+    return newEstimate;
+  };
 
   return (
     <AppContext.Provider value={{
       state,
       dispatch,
+      stats,
+      refreshStats,
       addJob,
       updateJob,
       deleteJob,
@@ -189,13 +264,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       deleteCustomer,
       addTechnician,
       updateTechnician,
-      deleteTechnician,
       addInvoice,
       updateInvoice,
-      deleteInvoice,
       addEstimate,
-      updateEstimate,
-      deleteEstimate,
     }}>
       {children}
     </AppContext.Provider>
