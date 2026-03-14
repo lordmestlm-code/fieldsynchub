@@ -262,6 +262,51 @@ app.get('/api/revenue', (req, res) => {
   ]);
 });
 
+// Calendar events
+app.get('/api/calendar/events', (req, res) => {
+  const { start, end } = req.query;
+  const startDate = start ? new Date(start) : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const endDate = end ? new Date(end) : new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+  
+  const events = db.jobs
+    .filter(job => {
+      if (!job.scheduledDate) return false;
+      const jobDate = new Date(job.scheduledDate);
+      return jobDate >= startDate && jobDate <= endDate;
+    })
+    .map(job => {
+      const customer = db.customers.find(c => c.id === job.customerId);
+      const tech = db.technicians.find(t => t.id === job.technicianId);
+      return {
+        id: job.id,
+        title: job.title,
+        date: job.scheduledDate,
+        time: job.scheduledTime,
+        status: job.status,
+        priority: job.priority,
+        customerName: customer?.name || 'Unknown',
+        technicianName: tech?.name || 'Unassigned',
+        address: job.address
+      };
+    });
+  
+  res.json(events);
+});
+
+// Login (demo)
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  // Demo login - accept any credentials
+  if (email && password) {
+    res.json({ 
+      token: 'demo', 
+      user: { id: 'user-1', name: 'Admin User', email, role: 'admin' } 
+    });
+  } else {
+    res.status(401).json({ error: 'Invalid credentials' });
+  }
+});
+
 // Start server
 loadDB();
 app.listen(PORT, () => {
